@@ -55,13 +55,14 @@
     <Content Include="css\style.css" />
     <Content Include="images\cancel16.png" />
     <Content Include="images\save16.png" />
-    <Content Include="scripts\library\globalize.custom.js" />
+    <Content Include="scripts\library\tools.js" />
     <Content Include="scripts\library\jquery_ui.js" />
     <Content Include="scripts\library\jquery.js" />
     <Content Include="scripts\library\json2.js" />
     <Content Include="scripts\library\signature_pad.js" />
     <Content Include="scripts\library\XrmServiceToolkit.js" />
-    <Content Include="scripts\signature.globalize.js" />
+    <Content Include="scripts\signature.fr.js" />
+    <Content Include="scripts\signature.js" />
     <Content Include="Signature.html" />
     <Content Include="Web.config" />
   </ItemGroup>
