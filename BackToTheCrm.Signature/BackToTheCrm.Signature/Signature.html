@@ -1,0 +1,199 @@
+﻿<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=10" />
+    <title>Signature numérique</title>
+    <link href="./css/library/themes/metro/jquery_ui.css" rel="stylesheet" type="text/css" />
+    <link href="./css/signature.css" rel="stylesheet" type="text/css" />
+    <link href="./css/style.css" rel="stylesheet" type="text/css" />
+    <script type="text/javascript" src="../ClientGlobalContext.js.aspx"></script>
+    <script type="text/javascript" src="./scripts/library/jquery.js"></script>
+    <script type="text/javascript" src="./scripts/library/jquery_ui.js"></script>
+    <script type="text/javascript" src="./scripts/library/json2.js"></script>
+    <script type="text/javascript" src="./scripts/library/XrmServiceToolkit.js"></script>
+    <script type="text/javascript" src="./scripts/library/globalize.custom.js"></script>
+    <script type="text/javascript" src="./scripts/library/signature_pad.js"></script>
+    <script type="text/javascript">
+        /// <reference path="./scripts/library/jquery.js" />
+        /// <reference path="./scripts/library/jquery_ui.js" />
+        /// <reference path="./scripts/library/json2.js" />
+        /// <reference path="./scripts/library/XrmServiceToolkit.js" />
+        /// <reference path="./scripts/library/globalize.custom.js" />
+        /// <reference path="./scripts/library/signature_pad.js" />
+
+        (function ($) {
+            var parameters = {},
+                signaturePad = null,
+                annotationId = null;
+
+            var getURLParameter = function (name) {
+                /// <summary>
+                /// Get a parameter set in the URL
+                /// </summary>
+                /// <param name="name">Name of the parameter to get</param>
+                /// <returns type="String">Value of the parameter, null if the parameter didn't exist</returns>
+                return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.search) || [, ""])[1].replace(/\+/g, '%20')) || null;
+            };
+
+            var getExistingInformations = function () {
+
+                var entityId = parameters.id || getURLParameter("id");
+                var fetchXml = [
+                    '<entity name="annotation">',
+                        '<attribute name="annotationid" />',
+                        '<attribute name="mimetype" />',
+                        '<attribute name="documentbody" />',
+                        '<filter type="and">',
+                            '<condition attribute="filename" operator="eq" value="' + parameters.annotation.filename + '" />',
+                            '<condition attribute="subject" operator="eq" value="' + (parameters.annotation.subject || parameters.annotation.filename) + '" />',
+                            '<condition attribute="objectid" operator="eq" value="' + entityId + '" />',
+                        '</filter>',
+                    '</entity>'
+                ].join("");
+                var results = XrmServiceToolkit.Soap.Fetch(fetchXml, true);
+                if (results.length > 0) {
+                    annotationId = results[0].id;
+                    if (results[0].attributes.documentbody && results[0].attributes.mimetype) {
+                        signaturePad.fromDataURL("data:" + results[0].attributes.mimetype.value + ";base64," + results[0].attributes.documentbody.value);
+                    }
+                }
+            };
+
+            var save = function () {
+                if (parameters) {
+                    var entityId = parameters.id || getURLParameter("id");
+                    try {
+                        var dataURI = signaturePad.toDataURL();
+                        dataURI = dataURI.split(",");
+                        var regex = /^data:(.*);base64$/i;
+                        var mime = dataURI[0].match(regex);
+                        mime = mime[1];
+                        // Sauvegarde l'image
+                        var annotation;
+                        if (!!annotationId) {
+                            annotation = new XrmServiceToolkit.Soap.BusinessEntity("annotation", annotationId);
+                        }
+                        else {
+                            annotation = new XrmServiceToolkit.Soap.BusinessEntity("annotation");
+                        }
+                        annotation.attributes["objectid"] = {
+                            type: "EntityReference",
+                            logicalName: parameters.entityLogicalName,
+                            id: entityId
+                        };
+                        annotation.attributes["subject"] = (parameters.annotation.subject || parameters.annotation.filename);
+                        annotation.attributes["filename"] = parameters.annotation.filename;
+                        annotation.attributes["mimetype"] = mime;
+                        annotation.attributes["documentbody"] = dataURI[1];
+                        if (!!annotationId) {
+                            XrmServiceToolkit.Soap.Update(annotation);
+                        }
+                        else {
+                            XrmServiceToolkit.Soap.Create(annotation);
+                        }
+
+                        if (!!window.opener) {
+                            window.close();
+                        }
+
+                    } catch (e) {
+                        Xrm.Utility.alertDialog("Des erreurs sont survenues lors de l'enregistrement.");
+                        console.log(e);
+                        return false;
+                    }
+                }
+                return true;
+            };
+
+            $(function () {
+                debugger;
+                var $clearButton = $("[data-action=clear]"),
+                    $saveButton = $("[data-action=save]"),
+                    canvas = $("canvas").get(0);
+
+                try {
+                    parameters = {
+                        id: getURLParameter("id"),
+                        entityLogicalName: getURLParameter("typename"),
+                        annotation: JSON.parse(getURLParameter("data"))
+                    };
+                } catch (e) {
+                    console.log(e);
+                    Xrm.Utility.alertDialog("Les paramètres de la signature contiennent une erreur.");
+                }
+
+                $clearButton
+                    .button({
+                        icons: {
+                            primary: "crm-icon-delete"
+                        }
+                    })
+                    .click(function (event) {
+                        signaturePad.clear();
+                    });
+
+                $saveButton
+                    .button({
+                        icons: {
+                            primary: "crm-icon-save"
+                        }
+                    })
+                    .click(function (event) {
+                        if (signaturePad.isEmpty()) {
+                            Xrm.Utility.alertDialog("Veuillez signer avant d'enregistrer.");
+                        } else {
+                            save();
+                        }
+                    });
+
+                // Adjust canvas coordinate space taking into account pixel ratio,
+                // to make it look crisp on mobile devices.
+                // This also causes canvas to be cleared.
+                function resizeCanvas() {
+                    var ratio = window.devicePixelRatio || 1;
+                    canvas.width = canvas.offsetWidth * ratio;
+                    canvas.height = canvas.offsetHeight * ratio;
+                    canvas.getContext("2d").scale(ratio, ratio);
+                }
+
+                var options = {
+                    penColor: "navy",
+                    backgroundColor: "rgba(255,255,255,0)",
+                    minWidth: 1.5,
+                    maxWidth: 5
+                };
+
+                $(window).resize(resizeCanvas);
+                resizeCanvas();
+
+                signaturePad = new SignaturePad(canvas, options);
+                getExistingInformations();
+            });
+        })(jQuery);
+    </script>
+</head>
+<body>
+    <div class="m-signature-pad--dialog">
+        <div class="error">
+        </div>
+        <form></form>
+    </div>
+    <div id="signature-pad" class="m-signature-pad">
+        <div class="m-signature-pad--body">
+            <canvas></canvas>
+        </div>
+        <div class="m-signature-pad--footer">
+            <div class="description">
+                Signez ci-dessus
+            </div>
+            <button class="button clear" data-action="clear">
+                Effacer
+            </button>
+            <button class="button save" data-action="save">
+                Enregistrer
+            </button>
+        </div>
+    </div>
+</body>
+</html>

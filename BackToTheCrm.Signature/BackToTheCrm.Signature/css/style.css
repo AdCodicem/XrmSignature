@@ -1,0 +1,24 @@
+﻿body
+{
+    margin: 0;
+    font-family: Segoe\000020UI,Tahoma,Arial,sans-serif;
+    font-size: 11px;
+}
+
+.ui-button-text-icon-primary .ui-icon
+{
+    margin-top: -9px !important;
+}
+
+.ui-button .ui-icon.crm-icon-delete {
+    background: transparent url(../images/cancel16.png) no-repeat scroll;
+    width: 16px;
+    height: 16px;
+}
+
+.ui-button .ui-icon.crm-icon-save
+{
+    background: transparent url(../images/save16.png) no-repeat scroll;
+    width: 16px;
+    height: 16px;
+}
