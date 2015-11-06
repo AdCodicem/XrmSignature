@@ -404,8 +404,8 @@
         var options = {
             penColor: "black",
             backgroundColor: "rgba(255,255,255,0)",
-            minWidth: 1,
-            maxWidth: 3
+            minWidth: 0.5,
+            maxWidth: 2.5
         };
 
         var resizeCanvas = function () {
