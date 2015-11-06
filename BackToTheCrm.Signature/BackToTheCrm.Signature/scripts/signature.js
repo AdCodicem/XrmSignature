@@ -15,7 +15,8 @@
                         description: "Sign above",
                         clear: "Clear",
                         save: "Save",
-                        saveAlert: "Please sign before clicking Save.",
+                        saveSignatureAlert: "Please sign before clicking Save.",
+                        saveCreateAlert: "The record must be created before saving the signature.",
                         paramError: "The parameters contains error. Please contact your administrator.",
                         saveError: "An error has occured while saving."
                     }
@@ -24,6 +25,7 @@
         }
     });
 
+    // Get user locale
     var lcidLocaleMapping = {
         "1025": "ar",
         "1026": "bg",
@@ -206,11 +208,14 @@
 
     var parameters = {},
         signaturePad = null,
-        annotationId = null;
+        annotationId = null,
+        signatureImage = null;
 
-    var getExistingInformations = function () {
-
-        var entityId = parameters.id || BackToTheCrm.Tools.getURLParameter("id");
+    var getSignature = function () {
+        /// <summary>
+        /// Get the saved signature and display it
+        /// </summary>
+        var entityId = BackToTheCrm.Tools.getParentId(parameters.id);
         var fetchXml = [
             '<entity name="annotation">',
                 '<attribute name="annotationid" />',
@@ -228,20 +233,42 @@
             annotationId = results[0].id;
             if (results[0].attributes.documentbody && results[0].attributes.mimetype) {
                 signaturePad.fromDataURL("data:" + results[0].attributes.mimetype.value + ";base64," + results[0].attributes.documentbody.value);
+                signatureImage = results[0].attributes.documentbody.value;
             }
         }
     };
 
     var save = function () {
+        /// <summary>
+        /// Save the signature in PNG format within an annotation
+        /// </summary>
+        /// <returns type="Boolean">True if saved successfully, else False</returns>
         if (parameters) {
-            var entityId = parameters.id || BackToTheCrm.Tools.getURLParameter("id");
+            var entityId = BackToTheCrm.Tools.getParentId(parameters.id);
             try {
+                // Get the signature in PNG format base64 encoded
                 var dataURI = signaturePad.toDataURL();
                 dataURI = dataURI.split(",");
                 var regex = /^data:(.*);base64$/i;
                 var mime = dataURI[0].match(regex);
                 mime = mime[1];
-                // Sauvegarde l'image
+
+                if (signatureImage === dataURI[1]) {
+                    // Skip the saving of unmodified image
+                    return true;
+                }
+                else {
+                    signatureImage = dataURI[1];
+                }
+
+                if (signaturePad.isEmpty() && !!annotationId) {
+                    // Delete annotation if signature cleared
+                    XrmServiceToolkit.Soap.Delete("annotation", annotationId);
+                    annotationId = null;
+                    return true;
+                }
+
+                // Create or Update the annotation
                 var annotation;
                 if (!!annotationId) {
                     annotation = new XrmServiceToolkit.Soap.BusinessEntity("annotation", annotationId);
@@ -257,18 +284,17 @@
                 annotation.attributes["subject"] = (parameters.annotation.subject || parameters.annotation.filename);
                 annotation.attributes["filename"] = parameters.annotation.filename;
                 annotation.attributes["mimetype"] = mime;
-                annotation.attributes["documentbody"] = dataURI[1];
+                annotation.attributes["documentbody"] = signatureImage;
                 if (!!annotationId) {
                     XrmServiceToolkit.Soap.Update(annotation);
                 }
                 else {
-                    XrmServiceToolkit.Soap.Create(annotation);
+                    annotationId = XrmServiceToolkit.Soap.Create(annotation);
                 }
 
                 if (!!window.opener) {
                     window.close();
                 }
-
             } catch (e) {
                 Xrm.Utility.alertDialog(BackToTheCrm.Signature.messages[locale].saveError);
                 console.log(e);
@@ -279,19 +305,26 @@
     };
 
     function init() {
+        /// <summary>
+        /// Initialize the signature component and load the localization
+        /// </summary>
         $.ajaxSetup({
             cache: true
         });
 
         if (!!userLcid) {
-            $.getScript("scripts/signature." + locale + ".js", initCallback).fail(function () {
-                locale = "en";
-            });
+            $.getScript("scripts/signature." + locale + ".js", initCallback)
+                .fail(function () {
+                    locale = "en";
+                    initCallback();
+                });
         }
     }
 
-    var initCallback = function() {
-        debugger;
+    var initCallback = function () {
+        /// <summary>
+        /// Callback initializing the signature component after the localization has been loaded
+        /// </summary>
         var $clearButton = $("[data-action=clear]"),
             $saveButton = $("[data-action=save]"),
             $descriptionDiv = $(".description"),
@@ -302,8 +335,9 @@
         $saveButton.text(BackToTheCrm.Signature.messages[locale].save);
 
         try {
+            // Get the parameters
             parameters = {
-                id: BackToTheCrm.Tools.getURLParameter("id"),
+                id: BackToTheCrm.Tools.getParentId(),
                 entityLogicalName: BackToTheCrm.Tools.getURLParameter("typename"),
                 annotation: JSON.parse(BackToTheCrm.Tools.getURLParameter("data"))
             };
@@ -312,6 +346,7 @@
             Xrm.Utility.alertDialog(BackToTheCrm.Signature.messages[locale].paramError);
         }
 
+        // Bind the buttons' events
         $clearButton
             .button({
                 icons: {
@@ -329,25 +364,43 @@
                 }
             })
             .click(function (event) {
-                if (signaturePad.isEmpty()) {
-                    Xrm.Utility.alertDialog(BackToTheCrm.Signature.messages[locale].saveAlert);
+                if (parameters.annotation.isMandatory === true && signaturePad.isEmpty()) {
+                    Xrm.Utility.alertDialog(BackToTheCrm.Signature.messages[locale].saveSignatureAlert);
                 } else {
-                    save();
+                    if (BackToTheCrm.Tools.isEmptyGuid(BackToTheCrm.Tools.getParentId(parameters.id))) {
+                        Xrm.Utility.alertDialog(BackToTheCrm.Signature.messages[locale].saveCreateAlert);
+                    }
+                    else {
+                        save();
+                    }
                 }
             });
 
+        // Add an event to save before closing
+        if (parameters.annotation.autosave !== false) {
+            $(window).bind("beforeunload", function () {
+                if (parameters.annotation.isMandatory === true && signaturePad.isEmpty()) {
+                    Xrm.Utility.alertDialog(BackToTheCrm.Signature.messages[locale].saveSignatureAlert);
+                }
+                else if (!BackToTheCrm.Tools.isEmptyGuid(BackToTheCrm.Tools.getParentId(parameters.id))) {
+                    save();
+                }
+            });
+        }
+
+        // Pen options
         var options = {
-            penColor: "navy",
+            penColor: "black",
             backgroundColor: "rgba(255,255,255,0)",
-            minWidth: 1.5,
-            maxWidth: 5
+            minWidth: 1,
+            maxWidth: 3
         };
 
         var resizeCanvas = function () {
             /// <summary>
             /// Adjust canvas coordinate space taking into account pixel ratio,
             /// to make it look crisp on mobile devices.
-            /// This also causes canvas to be cleared. 
+            /// This also causes canvas to be cleared.
             /// </summary>
             var ratio = window.devicePixelRatio || 1;
             canvas.width = canvas.offsetWidth * ratio;
@@ -359,7 +412,8 @@
         resizeCanvas();
 
         signaturePad = new SignaturePad(canvas, options);
-        getExistingInformations();
+        if (!BackToTheCrm.Tools.isEmptyGuid(parameters.id)) {
+            getSignature();
+        }
     };
-
 })(jQuery);
