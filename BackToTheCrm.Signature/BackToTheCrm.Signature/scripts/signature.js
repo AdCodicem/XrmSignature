@@ -5,6 +5,18 @@
 /// <reference path="library/XrmServiceToolkit.js" />
 /// <reference path="library/signature_pad.js" />
 (function ($) {
+    /// <summary>
+    /// Signature for MSCRM
+    /// Author : Clément MARTY
+    /// Date : 2015-11-06
+    /// 
+    /// Include : 
+    /// - JSON2 :                   https://github.com/douglascrockford/JSON-js
+    /// - jQuery v1.11.1 :          https://jquery.com/
+    /// - jQuery UI v1.11.0 :       https://jqueryui.com/
+    /// - Signature Pad v1.5.1 :    https://github.com/szimek/signature_pad
+    /// - XrmServiceToolkit v2.0.1: https://xrmservicetoolkit.codeplex.com/
+    /// </summary>
     $.extend(true, window, {
         "BackToTheCrm": {
             "Signature": {
