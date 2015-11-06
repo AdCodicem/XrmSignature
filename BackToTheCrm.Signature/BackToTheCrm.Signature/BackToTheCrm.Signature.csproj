@@ -81,6 +81,8 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
+    <Content Include="release\XrmSignature_1_0_0_0_target_CRM_7.0.zip" />
+    <Content Include="release\XrmSignature_1_0_0_0_target_CRM_7.0_managed.zip" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
