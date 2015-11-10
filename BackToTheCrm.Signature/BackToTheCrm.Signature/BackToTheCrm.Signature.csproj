@@ -44,24 +44,16 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="css\library\themes\metro\images\ui_icons_002050_0.png" />
-    <Content Include="css\library\themes\metro\images\ui_icons_002F77_0.png" />
-    <Content Include="css\library\themes\metro\images\ui_icons_525252_0.png" />
-    <Content Include="css\library\themes\metro\images\ui_icons_666666_0.png" />
-    <Content Include="css\library\themes\metro\images\ui_icons_d4d4d4_0.png" />
-    <Content Include="css\library\themes\metro\images\ui_icons_ffffff_0.png" />
-    <Content Include="css\library\themes\metro\jquery_ui.css" />
     <Content Include="css\signature.css" />
     <Content Include="css\style.css" />
     <Content Include="images\cancel16.png" />
     <Content Include="images\save16.png" />
+    <Content Include="scripts\lang\signature.en.js" />
     <Content Include="scripts\library\tools.js" />
-    <Content Include="scripts\library\jquery_ui.js" />
     <Content Include="scripts\library\jquery.js" />
-    <Content Include="scripts\library\json2.js" />
     <Content Include="scripts\library\signature_pad.js" />
     <Content Include="scripts\library\XrmServiceToolkit.js" />
-    <Content Include="scripts\signature.fr.js" />
+    <Content Include="scripts\lang\signature.fr.js" />
     <Content Include="scripts\signature.js" />
     <Content Include="Signature.html" />
     <Content Include="Web.config" />

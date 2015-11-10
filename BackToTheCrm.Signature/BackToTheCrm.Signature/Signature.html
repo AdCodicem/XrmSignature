@@ -2,15 +2,12 @@
 <html lang="fr">
 <head>
     <meta charset="utf-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=10" />
+    <meta http-equiv="X-UA-Compatible" />
     <title>Signature</title>
-    <link href="./css/library/themes/metro/jquery_ui.css" rel="stylesheet" type="text/css" />
     <link href="./css/signature.css" rel="stylesheet" type="text/css" />
     <link href="./css/style.css" rel="stylesheet" type="text/css" />
     <script type="text/javascript" src="../ClientGlobalContext.js.aspx"></script>
     <script type="text/javascript" src="./scripts/library/jquery.js"></script>
-    <script type="text/javascript" src="./scripts/library/jquery_ui.js"></script>
-    <script type="text/javascript" src="./scripts/library/json2.js"></script>
     <script type="text/javascript" src="./scripts/library/XrmServiceToolkit.js"></script>
     <script type="text/javascript" src="./scripts/library/signature_pad.js"></script>
     <script type="text/javascript" src="./scripts/library/tools.js"></script>
@@ -29,9 +26,13 @@
         <div class="m-signature-pad--footer">
             <div class="description">
             </div>
-            <button class="button clear" data-action="clear">
+            <button class="button clear ui-button ui-widget ui-state-default ui-corner-all ui-button-text-icon-primary" data-action="clear" role="button">
+                <span class="ui-button-icon-primary ui-icon crm-icon-delete"></span>
+                <span class="ui-button-text"></span>
             </button>
-            <button class="button save" data-action="save">
+            <button class="button save ui-button ui-widget ui-state-default ui-corner-all ui-button-text-icon-primary" data-action="save" role="button">
+                <span class="ui-button-icon-primary ui-icon crm-icon-save"></span>
+                <span class="ui-button-text"></span>
             </button>
         </div>
     </div>

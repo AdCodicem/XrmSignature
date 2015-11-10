@@ -22,24 +22,6 @@
 	border-radius: 4px;
 }
 
-.m-signature-pad:before, .m-signature-pad:after
-{
-	position: absolute;
-	z-index: -1;
-	content: "";
-	width: 40%;
-	height: 10px;
-	left: 20px;
-	bottom: 10px;
-	background: transparent;
-	-webkit-transform: skew(-3deg) rotate(-3deg);
-	-moz-transform: skew(-3deg) rotate(-3deg);
-	-ms-transform: skew(-3deg) rotate(-3deg);
-	-o-transform: skew(-3deg) rotate(-3deg);
-	transform: skew(-3deg) rotate(-3deg);
-	box-shadow: 0 8px 12px rgba(0, 0, 0, 0.4);
-}
-
 .m-signature-pad:after
 {
 	left: auto;

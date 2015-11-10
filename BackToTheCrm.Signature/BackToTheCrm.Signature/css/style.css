@@ -1,12 +1,62 @@
-﻿body
-{
+﻿body {
     margin: 0;
     font-family: Segoe\000020UI,Tahoma,Arial,sans-serif;
     font-size: 11px;
 }
 
-.ui-button-text-icon-primary .ui-icon
-{
+/* General */
+html, body{background-color:#ffffff;}
+.ui-widget{font-family:"Segoe UI", Helvetica, Verdana, sans-serif;}
+
+/* Component containers
+----------------------------------*/
+.ui-widget { font-family:"Segoe UI", Helvetica, Verdana, sans-serif; font-size: 1.1em; }
+.ui-widget .ui-widget { font-size: 1em; }
+.ui-widget button { font-family:"Segoe UI", Helvetica, Verdana, sans-serif; font-size: 1em; }
+
+
+.ui-widget :active { outline: none; }
+
+/* Button */
+button.ui-button {
+    font-family: "Segoe UI", Helvetica, Verdana, sans-serif;
+    font-size: 1.1em;
+    border-style: none;
+}
+
+.ui-button {
+    text-transform: uppercase;
+}
+
+/* states and images */
+.ui-icon {
+    display: block;
+    text-indent: -99999px;
+    overflow: hidden;
+    background-repeat: no-repeat;
+}
+/*button text element */
+.ui-button .ui-button-text {
+    display: block;
+    line-height: 1.4;
+}
+
+.ui-button-text-icon-primary .ui-button-text {
+    padding: .4em 1em .4em 2.1em;
+}
+
+/*button icon element(s) */
+.ui-button-text-icon-primary .ui-icon {
+    position: absolute;
+    top: 50%;
+    margin-top: -12px;
+}
+
+.ui-button-text-icon-primary .ui-button-icon-primary {
+    left: .35em;
+}
+
+.ui-button .ui-icon {
     margin-top: -9px !important;
 }
 
@@ -16,9 +66,100 @@
     height: 16px;
 }
 
-.ui-button .ui-icon.crm-icon-save
-{
+.ui-button .ui-icon.crm-icon-save {
     background: transparent url(../images/save16.png) no-repeat scroll;
     width: 16px;
     height: 16px;
+}
+
+.ui-button {
+    display: inline-block;
+    position: relative;
+    padding: 0;
+    text-decoration: none !important;
+    cursor: pointer;
+    text-align: center;
+    zoom: 1;
+    overflow: visible;
+}
+
+/* the overflow property removes extra width in IE */
+button.ui-button::-moz-focus-inner {
+    border: 0;
+    padding: 0;
+}
+/* Button states */
+.ui-button {
+    background-color: #ffffff;
+    border-color: #ffffff;
+    color: #666666;
+}
+
+.ui-button:focus {
+    background-color: #D7EBF9;
+    border-color: #D7EBF9;
+    color: #666666;
+}
+
+.ui-button:hover {
+    background-color: #D7EBF9;
+    border-color: #D7EBF9;
+    color: #666666;
+}
+
+.ui-button:active {
+    background-color: #B1D6F0;
+    border-color: #B1D6F0;
+    color: #ffffff;
+}
+
+/* Corner radius */
+.ui-corner-all {
+    -moz-border-radius-topleft: 0;
+    -webkit-border-top-left-radius: 0;
+    -khtml-border-top-left-radius: 0;
+    border-top-left-radius: 0;
+}
+
+.ui-corner-all {
+    -moz-border-radius-topright: 0;
+    -webkit-border-top-right-radius: 0;
+    -khtml-border-top-right-radius: 0;
+    border-top-right-radius: 0;
+}
+
+.ui-corner-all {
+    -moz-border-radius-bottomleft: 0;
+    -webkit-border-bottom-left-radius: 0;
+    -khtml-border-bottom-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
+
+.ui-corner-all {
+    -moz-border-radius-bottomright: 0;
+    -webkit-border-bottom-right-radius: 0;
+    -khtml-border-bottom-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.ui-button .ui-button-icon-primary {
+    left: .35em;
+}
+
+.ui-button .ui-icon {
+    position: absolute;
+    top: 50%;
+    margin-top: -12px;
+}
+
+.ui-icon {
+    width: 16px;
+    height: 16px;
+}
+
+.ui-icon {
+    display: block;
+    text-indent: -99999px;
+    overflow: hidden;
+    background-repeat: no-repeat;
 }
