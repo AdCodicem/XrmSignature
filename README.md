@@ -20,8 +20,6 @@ Many thanks to [Szymon Nowak](https://github.com/szimek) for his work on the ori
 # Library used
 My work is based on the following libraries \:
 
-- JSON2 :                   https://github.com/douglascrockford/JSON-js
 - jQuery v1.11.1 :          https://jquery.com/
-- jQuery UI v1.11.0 :       https://jqueryui.com/
 - Signature Pad v1.5.1 :    https://github.com/szimek/signature_pad
 - XrmServiceToolkit v2.0.1: https://xrmservicetoolkit.codeplex.com/
